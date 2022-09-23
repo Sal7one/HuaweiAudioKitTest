@@ -20,6 +20,7 @@ open class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    private var mHwAudioPlayerManager: HwAudioPlayerManager? = null
     private var mHwAudioManager: HwAudioManager? = null
     private var playItemList: MutableList<HwAudioPlayItem>? = mutableListOf()
     private var currentAudio: HwAudioPlayItem? = null
@@ -30,10 +31,6 @@ open class MainActivity : AppCompatActivity() {
         "http://traffic.libsyn.com/secure/adbackstage/ADB187_SystemUI_final.mp3",
     )
 
-    private var mHwAudioPlayerManager: HwAudioPlayerManager? = null
-
-
-    // UI Components
     private var playTitle: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,8 +42,8 @@ open class MainActivity : AppCompatActivity() {
         playTitle = binding.tvsongname
         playPause = binding.playPause
 
+            val hwAudioPlayerConfig = HwAudioPlayerConfig(this)
         lifecycleScope.launch {
-            val hwAudioPlayerConfig = HwAudioPlayerConfig(this@MainActivity)
             createHwAudioManager(hwAudioPlayerConfig, getOnlinePlaylist())
         }
 
@@ -68,18 +65,18 @@ open class MainActivity : AppCompatActivity() {
             return
         }
         when (view.id) {
-//            R.id.prev -> previousAudio()
+            R.id.prev -> previousAudio()
             R.id.play_pause -> playPauseAudio()
-//            R.id.next -> nextAudio()
+            R.id.next -> nextAudio()
             else -> Log.d("MainActivity", "no button clicked")
         }
     }
-//
-//    private fun nextAudio() {
-//        mHwAudioPlayerManager?.playNext()
-//        findNext()
-//        mHwAudioManager?.queueManager?.currentPlayItem?.let { updateSongInfo(it.audioTitle) }
-//    }
+
+    private fun nextAudio() {
+        mHwAudioPlayerManager?.playNext()
+        findNext()
+        mHwAudioManager?.queueManager?.currentPlayItem?.let { updateSongInfo(it.audioTitle) }
+    }
 
     private fun updateSongInfo(audioTitle: String) {
         playTitle?.text = audioTitle
@@ -110,26 +107,26 @@ open class MainActivity : AppCompatActivity() {
         return playItemList
     }
 
-//    private fun previousAudio() {
-//        mHwAudioPlayerManager?.playPre()
-//        findNext()
-//        mHwAudioManager?.queueManager?.currentPlayItem?.let { updateSongInfo(it.audioTitle) }
-//    }
-//
-//    private fun findNext() {
-//        var index = 0
-//        try {
-//            for (audio in playItemList!!) {
-//                if (currentAudio!!.audioId === audio.audioId) {
-//                    currentAudio = playItemList!![index + 1]
-//                    break
-//                }
-//                index++
-//            }
-//        } catch (e: Exception) {
-//            currentAudio = playItemList!![0]
-//        }
-//    }
+    private fun previousAudio() {
+        mHwAudioPlayerManager?.playPre()
+        findNext()
+        mHwAudioManager?.queueManager?.currentPlayItem?.let { updateSongInfo(it.audioTitle) }
+    }
+
+    private fun findNext() {
+        var index = 0
+        try {
+            for (audio in playItemList!!) {
+                if (currentAudio!!.audioId === audio.audioId) {
+                    currentAudio = playItemList!![index + 1]
+                    break
+                }
+                index++
+            }
+        } catch (e: Exception) {
+            currentAudio = playItemList!![0]
+        }
+    }
 
     private fun playPauseAudio() {
         if (mHwAudioPlayerManager != null) {
